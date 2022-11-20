@@ -3,6 +3,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+sample_subtitle.srt
+
 # C extensions
 *.so
 
