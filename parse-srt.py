@@ -1,6 +1,7 @@
 from pathlib import Path
 import unicodedata
 
+
 def parse_subtitle(fp: Path) -> list[str]:
     """Parse the .srt to file and extract text
 
@@ -16,8 +17,10 @@ def parse_subtitle(fp: Path) -> list[str]:
         if not (line.isdigit() or "-->" in line):
             filtered_lines.append(line)
 
+    return filtered_lines
+
 
 if __name__ == "__main__":
-    sub = Path("Spider-Man_No_Way_Home.2022.1080p.Bluray.DTS-HD.MA.5.1.X264-EVO.srt")
+    sub = Path("sample_subtitle.srt")
     text = parse_subtitle(sub)
-    
+    print(text)
