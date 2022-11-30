@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "efficient-vocabulary"
+version = "0.1.0"
+description = "This tool will help you improve your English vocabulary using TV shows and movies. You can find and learn words that you don't already know before watching the movie or TV show."
+authors = ["Dasun Sathsara <me@dasunsathsara.com>"]
+readme = "README.md"
+packages = [{include = "efficient_vocabulary"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^22.10.0"
+mypy = "^0.991"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
