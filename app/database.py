@@ -1,5 +1,5 @@
 import sqlite3
 
-#database connection
+# database connection
 
-#save found words
+# save found words
