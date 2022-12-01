@@ -3,6 +3,8 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 
+from pathlib import Path
+
 
 def download_nltk_data() -> None:
     """Download required data for nltk"""
@@ -51,4 +53,33 @@ def get_words_nltk(words: list[str]) -> list[str]:
         # print(f"{word} ({tag}) -> {lemmatized_word}")
         final_words.append(lemmatized_word)
 
-    return filtered_words
+    return list(final_words)
+
+
+def get_words(words: list[str]) -> list[str]:
+    """Checks if the identified words are in the `all_words` file and filter out words that are in the `common_words` file"""
+    parent_path = Path(".").parent
+    all_words_path = parent_path / "word_data" / "all_words.txt"
+    common_words_path = parent_path / "word_data" / "common_words.txt"
+
+    all_words = set(all_words_path.read_text().split("\n"))
+    common_words = set(common_words_path.read_text().split("\n"))
+
+    return set(words).intersection(all_words).difference(common_words)
+
+
+if __name__ == "__main__":
+    import parse_srt
+
+    parent_path = Path(".").parent
+    subtitle = parent_path / "subtitles" / "sample_subtitle.srt"
+
+    # a = get_words(get_words_nltk())
+    subtitle_list = parse_srt.parse_subtitle(subtitle)
+    nltk_words = get_words_nltk(subtitle_list)
+
+    print(len(nltk_words))
+    print(nltk_words[:10])
+
+    # print(len(a))
+    # print(a)

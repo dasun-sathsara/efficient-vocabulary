@@ -8,8 +8,7 @@ def parse_subtitle(fp: Path) -> list[str]:
     Args:
         fp (Path): Path object pointing to the subtitle file
     """
-    with open(fp, "r") as f:
-        lines = f.readlines()
+    lines = fp.read_text().split('\n') 
 
     filtered_lines = []
     for line in lines:
