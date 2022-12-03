@@ -9,6 +9,8 @@ packages = [{include = "efficient_vocabulary"}]
 [tool.poetry.dependencies]
 python = "^3.10"
 nltk = "^3.7"
+typer = "^0.7.0"
+rich = "^12.6.0"
 
 
 [tool.poetry.group.dev.dependencies]

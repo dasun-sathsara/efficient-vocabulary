@@ -29,23 +29,22 @@ def get_words_nltk(words: list[str]) -> list[str]:
 
     full_string = "\n".join(words)
     words = word_tokenize(full_string)
-    filtered_words = set(map(lambda x: x.lower().replace(".", "").replace("?", ""), words)).difference(set(stopwords.words("english")))
-    tagged_words = nltk.pos_tag(filtered_words)
+    tagged_words = nltk.pos_tag(words)
 
     for word_tag in tagged_words:
         word, tag = word_tag
 
         if tag.startswith("NN"):
-            #* noun
+            # * noun
             lemmatized_word = lemmatizer.lemmatize(word, "n")
         elif tag.startswith("JJ"):
-            #* adjective
+            # * adjective
             lemmatized_word = lemmatizer.lemmatize(word, "a")
         elif tag.startswith("VB"):
-            #* verb
+            # * verb
             lemmatized_word = lemmatizer.lemmatize(word, "v")
         elif tag.startswith("RB"):
-            #* adverb
+            # * adverb
             lemmatized_word = lemmatizer.lemmatize(word, "r")
         else:
             lemmatized_word = word
@@ -53,13 +52,17 @@ def get_words_nltk(words: list[str]) -> list[str]:
         # print(f"{word} ({tag}) -> {lemmatized_word}")
         final_words.append(lemmatized_word)
 
-    return list(final_words)
+    filtered_words = set(map(lambda x: x.lower().replace(".", "").replace("?", ""), final_words)).difference(
+        set(stopwords.words("english"))
+    )
+
+    return list(filtered_words)
 
 
 def get_words(words: list[str]) -> list[str]:
     """Checks if the identified words are in the `all_words` file and filter out words that are in the `common_words` file"""
 
-    #* paths
+    # * paths
     parent_path = Path(".").parent
     all_words_path = parent_path / "word_data" / "25k.txt"
     # all_words_path = parent_path / "word_data" / "all_words.txt"
@@ -68,10 +71,10 @@ def get_words(words: list[str]) -> list[str]:
     all_words = set(all_words_path.read_text().split("\n"))
     common_words = set(common_words_path.read_text().split("\n"))
 
-    #* main filtering
+    # * main filtering
     final_filtered_words = list(set(words).intersection(all_words).difference(common_words))
 
-    #* filtering out words that are shorter than 3 letters
+    # * filtering out words that are shorter than 3 letters
     final_filtered_words = filter(lambda x: len(x) > 2, final_filtered_words)
 
     return list(final_filtered_words)
