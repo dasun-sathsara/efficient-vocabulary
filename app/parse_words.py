@@ -20,7 +20,7 @@ def download_nltk_data() -> None:
 def _get_words_nltk(words: list[str], ordered: bool = False, unique: bool = False) -> list[str]:
     """Extract a word list from the sentences and filter out stop words.
     Returns the lemmatized version of the word using parts of speech tagging.
-    By default, for increased performance, returns a unordered list of words with no duplicates.
+    By default, for increased performance, returns an unordered list of words with no duplicates.
 
     Args:
         words (list[str]): Subtitle text as a list of strings
@@ -34,8 +34,7 @@ def _get_words_nltk(words: list[str], ordered: bool = False, unique: bool = Fals
     full_string = "\n".join(words)
     words = word_tokenize(full_string)
 
-    # * basic cleaning
-    map(lambda x: x.lower().replace(".", "").replace("?", ""), words)
+    # * filter our non alphabetic words
     words = list(filter(lambda x: x.isalpha(), words))
 
     tagged_words = nltk.pos_tag(words)
@@ -58,8 +57,11 @@ def _get_words_nltk(words: list[str], ordered: bool = False, unique: bool = Fals
         else:
             lemmatized_word = word
 
-        print(f"{word} ({tag}) -> {lemmatized_word}")
+        # print(f"{word} ({tag}) -> {lemmatized_word}")
         lemmatized_words.append(lemmatized_word)
+
+    # * remove `. ?` from words
+    map(lambda x: x.lower().replace(".", "").replace("?", ""), lemmatized_word)
 
     if ordered:
         for lemmatized_word in lemmatized_words:
@@ -80,7 +82,7 @@ def get_words(subtitle_file: Path(), ordered: bool = False) -> list[str]:
         ordered (bool, optional): If True, returns a ordered list with no duplicates. Defaults to False.
     """
 
-    # * paths
+    # * word list paths
     parent_path = Path(".").parent
     all_words_path = parent_path / "word_data" / "25k.txt"
     # all_words_path = parent_path / "word_data" / "all_words.txt"
@@ -111,9 +113,9 @@ def get_words(subtitle_file: Path(), ordered: bool = False) -> list[str]:
         final_filtered_words = list(set(lemmatized_words).intersection(set(all_words)).difference(set(common_words)))
 
     # * filtering out words that are shorter than 3 letters
-    final_filtered_words = filter(lambda x: len(x) > 2, final_filtered_words)
+    final_filtered_words = list(filter(lambda x: len(x) > 2, final_filtered_words))
 
-    return list(final_filtered_words)
+    return final_filtered_words
 
 
 def get_words_with_frequency(words: list[str], sorted: bool = True):
