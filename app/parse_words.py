@@ -17,14 +17,14 @@ def download_nltk_data() -> None:
     nltk.download("averaged_perceptron_tagger")
 
 
-def _get_words_nltk(words: list[str], ordered: bool = False, unique: bool = False) -> list[str]:
+def _get_words_nltk(words: list[str], ordered: bool = False) -> list[str]:
     """Extract a word list from the sentences and filter out stop words.
     Returns the lemmatized version of the word using parts of speech tagging.
     By default, for increased performance, returns an unordered list of words with no duplicates.
 
     Args:
         words (list[str]): Subtitle text as a list of strings
-        ordered bool: If True, returns a ordered list of words with duplicates
+        ordered bool: If True, returns an ordered list of words with duplicates
     """
 
     final_words = []
@@ -73,13 +73,13 @@ def _get_words_nltk(words: list[str], ordered: bool = False, unique: bool = Fals
     return final_words
 
 
-def get_words(subtitle_file: Path(), ordered: bool = False) -> list[str]:
-    """Checks if the identified words are in the `all_words` file and filter out words that are in the `common_words` file.
-     By default, for increased performance, returns an unordered a list of words with no duplicates.
+def get_words(subtitle_file: Path, ordered: bool = False) -> list[str]:
+    """Returns the identfied words from the subtitle file.
+    By default, for increased performance, returns an unordered list of words with no duplicates.
 
     Args:
         subtitle_file (Path): Subtitle file
-        ordered (bool, optional): If True, returns a ordered list with no duplicates. Defaults to False.
+        ordered (bool, optional): If True, returns an ordered list with no duplicates. Defaults to False.
     """
 
     # * word list paths
@@ -118,23 +118,57 @@ def get_words(subtitle_file: Path(), ordered: bool = False) -> list[str]:
     return final_filtered_words
 
 
-def get_words_with_frequency(words: list[str], sorted: bool = True):
-    ...
+def get_words_with_frequency(subtitle_file: Path, sorted: bool = False) -> list[tuple[str, int]]:
+    """Returns the identfied words from the subtitle file with their frequency.
+
+    Args:
+        subtitle_file (Path): Subtitle file
+        sorted (bool, optional): Sort the words by the frequency
+    """
+
+    # * word list paths
+    parent_path = Path(".").parent
+    all_words_path = parent_path / "word_data" / "25k.txt"
+    # all_words_path = parent_path / "word_data" / "all_words.txt"
+    common_words_path = parent_path / "word_data" / "common_words.txt"
+
+    all_words = all_words_path.read_text().split("\n")
+    common_words = common_words_path.read_text().split("\n")
+
+    word_list = parse_subtitle(subtitle_file)
+    lemmatized_words = _get_words_nltk(word_list, ordered=True)
+
+    words_frequency_dict: dict[str, int] = {}
+    for lemmatized_word in lemmatized_words:
+        if (lemmatized_word in all_words) and (not lemmatized_word in common_words) and len(lemmatized_word) > 2:
+            if lemmatized_word not in words_frequency_dict.keys():
+                words_frequency_dict[lemmatized_word] = 1
+            else:
+                words_frequency_dict[lemmatized_word] += 1
+
+    words_frequency_list = []
+    for word, frequency in words_frequency_dict.items():
+        words_frequency_list.append((word, frequency))
+
+    if sorted:
+        words_frequency_list.sort(key=lambda tuple: tuple[1], reverse=True)
+
+    return words_frequency_list
 
 
 if __name__ == "__main__":
     import parse_srt
+    from rich import print, pretty
+
+    pretty.install()
 
     parent_path = Path(".").parent
     subtitle = parent_path / "subtitles" / "sample_subtitle.srt"
 
-    a = get_words(subtitle, ordered=True)
-
-    for i in range(len(a)):
-        print(a[i])
-
-        if i == 100:
-            break
+    freq_sorted = get_words_with_frequency(subtitle, sorted=True)
+    freq = get_words_with_frequency(subtitle, sorted=True)
+    w_ordered = get_words(subtitle, ordered=True)
+    w = get_words(subtitle)
 
     # # a = get_words(get_words_nltk())
     # subtitle_list = parse_srt.parse_subtitle(subtitle)
